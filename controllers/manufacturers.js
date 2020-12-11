@@ -9,19 +9,25 @@ const GetAllManufacturersProducts = async (request, response) => {
     ? response.send(result)
     : response.sendStatus(404)
 }
-const GetManufacturerByIdWithProducts = async (request, response) => {
-  const { id } = request.params
+const GetManufacturerByNameWithProducts = async (request, response) => {
+  try {
+    const { name } = request.params
 
-  const result = await models.Manufacturers.findOne({
-    where: { id },
-    include: [{ model: models.Products }]
-  })
+    const result = await models.Manufacturers.findOne({
+      where: {
+        name: { [models.Op.like]: `%${name}%` },
+      },
+      include: [{ model: models.Products }]
+    })
 
-  return result
-    ? response.send(result)
-    : response.sendStatus(404)
+    return result
+      ? response.send(result)
+      : response.sendStatus(404)
+  } catch (error) {
+    return response.status(500).send('Unable to retrieve hero, please try again')
+  }
 }
 
 
 
-module.exports = { GetAllManufacturersProducts, GetManufacturerByIdWithProducts }
+module.exports = { GetAllManufacturersProducts, GetManufacturerByNameWithProducts }
